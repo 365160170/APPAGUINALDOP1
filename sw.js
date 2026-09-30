@@ -1,16 +1,11 @@
 /* Service worker de Plan Aguinaldo. Se genera en cada build (vite.config.js).
-   - Archivos de la app: primero cache, así abre sin internet.
-   - Navegación: primero red, y si no hay conexión usa la copia guardada.
-   - config.js: primero red, para que tus cambios se vean sin esperar a un build. */
-const VERSION = '5f4dae9793';
+   - Navegación e index.html: primero red, y si no hay conexión usa la copia guardada.
+   - Íconos y manifest: primero cache.
+   - config.js: primero red, para que tus cambios se vean sin volver a compilar. */
+const VERSION = 'b70685f7fd';
 const CACHE = 'plan-aguinaldo-' + VERSION;
 const ASSETS = [
   "./",
-  "assets/index-CyqlhNY0.css",
-  "assets/index-c4b1nDGV.js",
-  "assets/pdf-X6Vo3Jog.js",
-  "assets/switzer-600-DSnGZNn0.woff2",
-  "assets/switzer-700-9JzFtTp4.woff2",
   "config.js",
   "icons/apple-touch-icon.png",
   "icons/favicon-64.png",
@@ -22,7 +17,12 @@ const ASSETS = [
 ];
 
 self.addEventListener('install', event => {
-  event.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
+  // Si falta algún archivo opcional (íconos, manifest), igual se instala.
+  event.waitUntil(
+    caches.open(CACHE)
+      .then(c => Promise.all(ASSETS.map(a => c.add(a).catch(() => null))))
+      .then(() => self.skipWaiting())
+  );
 });
 
 self.addEventListener('activate', event => {
@@ -47,7 +47,7 @@ self.addEventListener('fetch', event => {
       })
       .catch(() => caches.match(req).then(r => r || caches.match('./')));
 
-  if (req.mode === 'navigate' || url.pathname.endsWith('/config.js')) {
+  if (req.mode === 'navigate' || url.pathname.endsWith('/') || url.pathname.endsWith('.html') || url.pathname.endsWith('/config.js')) {
     event.respondWith(networkFirst());
     return;
   }

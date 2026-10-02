@@ -2,7 +2,7 @@
    - Navegación e index.html: primero red, y si no hay conexión usa la copia guardada.
    - Íconos y manifest: primero cache.
    - config.js: primero red, para que tus cambios se vean sin volver a compilar. */
-const VERSION = 'bfe83b3dfc';
+const VERSION = '1b3fe038cb';
 const CACHE = 'plan-aguinaldo-' + VERSION;
 const ASSETS = [
   "./",
@@ -13,6 +13,7 @@ const ASSETS = [
   "icons/icon-512.png",
   "icons/maskable-512.png",
   "index.html",
+  "jspdf.min.js",
   "manifest.webmanifest"
 ];
 
